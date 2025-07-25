@@ -30,5 +30,6 @@ namespace GamaEdtech.Data.Dto.School
         public IEnumerable<long>? Tags { get; set; }
         public int UserId { get; set; }
         public DateTimeOffset Date { get; set; }
+        public long? DefaultImageId { get; set; }
     }
 }
