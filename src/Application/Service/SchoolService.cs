@@ -383,6 +383,18 @@ namespace GamaEdtech.Application.Service
                 }
 
                 _ = await uow.SaveChangesAsync();
+                if (requestDto.DefaultImageId.HasValue)
+                {
+                    var result = await SetDefaultSchoolImageAsync(new()
+                    {
+                        Id = requestDto.DefaultImageId.Value,
+                        SchoolId = school.Id,
+                    });
+                    if (result.OperationResult is not OperationResult.Succeeded)
+                    {
+                        return new(result.OperationResult) { Errors = result.Errors };
+                    }
+                }
 
                 return new(OperationResult.Succeeded) { Data = school.Id };
             }
@@ -956,6 +968,12 @@ namespace GamaEdtech.Application.Service
                     return new(OperationResult.NotFound) { Errors = [new() { Message = Localizer.Value["SchoolImageNotFound"] },], };
                 }
 
+                if (schoolImage.IsDefault)
+                {
+                    _ = await uow.GetRepository<School>().GetManyQueryable(t => t.Id == schoolImage.SchoolId)
+                        .ExecuteUpdateAsync(t => t.SetProperty(p => p.DefaultImageId, p => null));
+                }
+
                 repository.Remove(schoolImage);
                 _ = await uow.SaveChangesAsync();
 
@@ -1180,6 +1198,7 @@ namespace GamaEdtech.Application.Service
                     UserId = contributionResult.Data.CreationUserId,
                     Date = contributionResult.Data.CreationDate,
                     Tuition = contributionResult.Data.Data.Tuition,
+                    DefaultImageId = contributionResult.Data.Data.DefaultImageId,
                 };
                 if (contributionResult.Data.Data!.Latitude.HasValue && contributionResult.Data.Data!.Longitude.HasValue)
                 {
