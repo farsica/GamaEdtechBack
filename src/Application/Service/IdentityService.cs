@@ -775,7 +775,7 @@ namespace GamaEdtech.Application.Service
                     };
                 }
 
-                int? cityId = userInfo.CityId != 0 ? userInfo.CityId : null;
+                var cityId = userInfo.CityId != 0 ? userInfo.CityId : null;
                 int? stateId = null;
                 int? countryId = null;
 

@@ -118,10 +118,10 @@ namespace GamaEdtech.Domain.Entity.Identity
         public string? Avatar { get; set; }
 
         [Column(nameof(CityId), DataType.Int)]
-        public int CityId { get; set; }
+        public int? CityId { get; set; }
 
         [Column(nameof(SchoolId), DataType.Int)]
-        public int SchoolId { get; set; }
+        public int? SchoolId { get; set; }
 
         public ICollection<ApplicationUserClaim>? UserClaims { get; set; }
 
