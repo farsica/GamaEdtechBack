@@ -1089,10 +1089,14 @@ namespace GamaEdtech.Application.Service
             try
             {
                 var uow = UnitOfWorkProvider.Value.CreateUnitOfWork();
-                var exists = await uow.GetRepository<School>().AnyAsync(t => t.Id == requestDto.SchoolId);
-                if (!exists)
+
+                if (requestDto.SchoolId.HasValue)
                 {
-                    return new(OperationResult.Failed) { Errors = [new() { Message = "School not found", },] };
+                    var exists = await uow.GetRepository<School>().AnyAsync(t => t.Id == requestDto.SchoolId);
+                    if (!exists)
+                    {
+                        return new(OperationResult.Failed) { Errors = [new() { Message = "School not found", },] };
+                    }
                 }
 
                 if (requestDto.Id.HasValue)
