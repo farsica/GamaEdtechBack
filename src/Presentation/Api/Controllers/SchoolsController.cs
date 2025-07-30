@@ -612,13 +612,15 @@ namespace GamaEdtech.Presentation.Api.Controllers
 
         [HttpPost("contributions"), Produces<ApiResponse<ManageSchoolContributionResponseViewModel>>()]
         [Permission(policy: null)]
-        public async Task<IActionResult<ManageSchoolContributionResponseViewModel>> CreateNewSchoolContribution([NotNull, FromBody] ManageNewSchoolContributionRequestViewModel request)
+        public async Task<IActionResult<ManageSchoolContributionResponseViewModel>> CreateNewSchoolContribution([NotNull, FromForm] ManageNewSchoolContributionRequestViewModel request)
         {
             try
             {
                 var result = await schoolService.Value.ManageSchoolContributionAsync(new()
                 {
                     UserId = User.UserId(),
+                    File = request.File,
+                    IsDefault = true,
                     SchoolContribution = new()
                     {
                         Address = request.Address,

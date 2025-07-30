@@ -914,7 +914,7 @@ namespace GamaEdtech.Application.Service
                 schoolImageRepository.Add(schoolImage);
                 _ = await uow.SaveChangesAsync();
 
-                if (result.Data.Data!.IsDefault || await schoolImageRepository.CountAsync(t => t.SchoolId == schoolImage.SchoolId) == 1)
+                if (result.Data.Data!.IsDefault || (await schoolImageRepository.GetManyQueryable(t => t.SchoolId == schoolImage.SchoolId).Select(t => t.Id).Take(2).ToListAsync()).Count == 1)
                 {
                     _ = await SetDefaultSchoolImageAsync(new()
                     {
@@ -1102,6 +1102,26 @@ namespace GamaEdtech.Application.Service
                     }
                 }
 
+                if (requestDto.File is not null)
+                {
+                    using MemoryStream stream = new();
+                    await requestDto.File.CopyToAsync(stream);
+
+                    var fileId = await fileService.Value.UploadFileAsync(new()
+                    {
+                        File = stream.ToArray(),
+                        ContainerType = ContainerType.School,
+                        FileExtension = Path.GetExtension(requestDto.File.FileName),
+                    });
+                    if (fileId.OperationResult is not OperationResult.Succeeded)
+                    {
+                        return new(fileId.OperationResult) { Errors = fileId.Errors, };
+                    }
+
+                    requestDto.SchoolContribution.ImageFileId = fileId.Data;
+                    requestDto.SchoolContribution.IsDefault = requestDto.IsDefault;
+                }
+
                 var contributionResult = await contributionService.Value.ManageContributionAsync(new ManageContributionRequestDto<SchoolContributionDto>
                 {
                     CategoryType = CategoryType.School,
@@ -1201,9 +1221,34 @@ namespace GamaEdtech.Application.Service
                 {
                     _ = await SetDefaultSchoolImageAsync(new()
                     {
-                        Id = contributionResult.Data.Data!.DefaultImageId.Value,
+                        Id = contributionResult.Data.Data.DefaultImageId.Value,
                         SchoolId = manageSchoolResult.Data,
                     });
+                }
+
+                if (!string.IsNullOrEmpty(contributionResult.Data.Data.ImageFileId))
+                {
+                    var schoolImageRepository = uow.GetRepository<SchoolImage>();
+                    var schoolImage = new SchoolImage
+                    {
+                        FileId = contributionResult.Data.Data.ImageFileId,
+                        FileType = FileType.SimpleImage,
+                        SchoolId = manageSchoolResult.Data,
+                        CreationUserId = contributionResult.Data.CreationUserId,
+                        CreationDate = contributionResult.Data.CreationDate,
+                        ContributionId = requestDto.ContributionId,
+                    };
+                    schoolImageRepository.Add(schoolImage);
+                    _ = await uow.SaveChangesAsync();
+
+                    if (contributionResult.Data.Data.IsDefault || (await schoolImageRepository.GetManyQueryable(t => t.SchoolId == schoolImage.SchoolId).Select(t => t.Id).Take(2).ToListAsync()).Count == 1)
+                    {
+                        _ = await SetDefaultSchoolImageAsync(new()
+                        {
+                            Id = schoolImage.Id,
+                            SchoolId = schoolImage.SchoolId,
+                        });
+                    }
                 }
 
                 if (contributionResult.Data.Data!.Comment is not null)
