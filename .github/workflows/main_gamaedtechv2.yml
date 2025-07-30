@@ -25,33 +25,33 @@ jobs:
       
 
       # Install EF Core tools
-      - name: Install dotnet ef
-        run: |
-            dotnet tool install --global dotnet-ef --version 9.*
-            dotnet tool restore
+      #- name: Install dotnet ef
+       # run: |
+        #    dotnet tool install --global dotnet-ef --version 9.*
+         #   dotnet tool restore
 
       
 
 
       # Run migrations for the DataSource project
-      - name: Run EF Core Migrations
-        run: |
-          cd src/GamaEdtech.DataSource
-          dotnet ef database update   
-        env:
-          AZURE_SQL_CONNECTIONSTRING: ${{ secrets.AZURE_SQL_CONNECTIONSTRING }}
+      #- name: Run EF Core Migrations
+       # run: |
+        #  cd src/GamaEdtech.DataSource
+         # dotnet ef database update   
+        #env:
+         # AZURE_SQL_CONNECTIONSTRING: ${{ secrets.AZURE_SQL_CONNECTIONSTRING }}
         # dotnet ef migrations bundle-o ${{env.DOTNET_ROOT}}/myapp/migrationsbundle
 
       # Build the main project
       - name: Build Rest API Project
         run: |
-          cd src/GamaEdtech.Gateway.RestApi
+          cd src
           dotnet build --configuration Release
 
       # Publish the main project
       - name: Publish Rest API Project
         run: |
-          cd src/GamaEdtech.Gateway.RestApi
+          cd src
           dotnet publish --configuration Release -o ${{env.DOTNET_ROOT}}/myapp
 
 
@@ -69,6 +69,7 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
@@ -79,15 +80,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1D2B4F7539B241EEAB52EAC74756448D }}
-           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C2F716EDBCB46FA880B6A740BAE8C99 }}
-           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_08A3858AB7CF495E99ECE16B280DD995 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B059BDB1C75A48178FCD3A59743831DB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_580F6CEA9084424783B5A44AFB25DD35 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A23FFCA5396E455CB1F01A9C3BEDEE33 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'gamaapi'
+          app-name: 'gamacoreapp'
           slot-name: 'Production'
           package: .
           
