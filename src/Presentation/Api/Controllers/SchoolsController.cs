@@ -166,6 +166,7 @@ namespace GamaEdtech.Presentation.Api.Controllers
                         DefaultImageUri = result.Data.DefaultImageUri,
                         Tuition = result.Data.Tuition,
                         Slug = result.Data.Name.Slugify(),
+                        Description = result.Data.Description,
                         Tags = result.Data.Tags?.Select(t => new TagResponseViewModel
                         {
                             Id = t.Id,
@@ -538,6 +539,7 @@ namespace GamaEdtech.Presentation.Api.Controllers
                         Tags = request.Tags,
                         DefaultImageId = request.DefaultImageId,
                         Tuition = request.Tuition,
+                        Description = request.Description,
                     },
                 });
 
@@ -586,6 +588,7 @@ namespace GamaEdtech.Presentation.Api.Controllers
                         Tags = request.Tags,
                         DefaultImageId = request.DefaultImageId,
                         Tuition = request.Tuition,
+                        Description = request.Description,
                     },
                 });
 
@@ -631,6 +634,7 @@ namespace GamaEdtech.Presentation.Api.Controllers
                         ZipCode = request.ZipCode,
                         Tags = request.Tags,
                         Tuition = request.Tuition,
+                        Description = request.Description,
                     },
                 });
 
@@ -750,6 +754,7 @@ namespace GamaEdtech.Presentation.Api.Controllers
                     ZipCode = dto.ZipCode,
                     Tags = dto.Tags,
                     Tuition = dto.Tuition,
+                    Description = dto.Description,
                 };
     }
 }

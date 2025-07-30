@@ -119,6 +119,7 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
                     OsmId = request.OsmId,
                     Tags = request.Tags,
                     Tuition = request.Tuition,
+                    Description = request.Description,
                     UserId = User.UserId(),
                     Date = DateTimeOffset.UtcNow,
                 };
@@ -171,6 +172,7 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
                     OsmId = request.OsmId,
                     Tags = request.Tags,
                     Tuition = request.Tuition,
+                    Description = request.Description,
                     UserId = User.UserId(),
                     Date = DateTimeOffset.UtcNow,
                 };
@@ -810,6 +812,7 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
             OsmId = dto.OsmId,
             DefaultImageUri = dto.DefaultImageUri,
             Tuition = dto.Tuition,
+            Description = dto.Description,
             Tags = dto.Tags?.Select(t => new TagResponseViewModel
             {
                 TagType = t.TagType,

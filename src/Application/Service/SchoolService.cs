@@ -210,6 +210,7 @@ namespace GamaEdtech.Application.Service
                     t.Quarter,
                     t.OsmId,
                     t.Tuition,
+                    t.Description,
                     DefaultImageId = t.DefaultImage != null ? t.DefaultImage.FileId : null,
                     Tags = t.SchoolTags.Select(s => new TagDto
                     {
@@ -252,6 +253,7 @@ namespace GamaEdtech.Application.Service
                     Tuition = school.Tuition,
                     DefaultImageUri = fileService.Value.GetFileUri(school.DefaultImageId, ContainerType.School).Data,
                     Tags = school.Tags,
+                    Description = school.Description,
                 };
                 return new(OperationResult.Succeeded) { Data = result };
             }
@@ -314,6 +316,7 @@ namespace GamaEdtech.Application.Service
                     school.CountryId = requestDto.CountryId ?? school.CountryId;
                     school.OsmId = requestDto.OsmId ?? school.OsmId;
                     school.Tuition = requestDto.Tuition ?? school.Tuition;
+                    school.Description = requestDto.Description ?? school.Description;
                     school.LastModifyDate = requestDto.Date;
                     school.LastModifyUserId = requestDto.UserId;
 
@@ -370,6 +373,7 @@ namespace GamaEdtech.Application.Service
                         CountryId = requestDto.CountryId,
                         OsmId = requestDto.OsmId,
                         Tuition = requestDto.Tuition,
+                        Description = requestDto.Description,
                     };
                     if (requestDto.Tags is not null)
                     {
@@ -1203,6 +1207,7 @@ namespace GamaEdtech.Application.Service
                     Date = contributionResult.Data.CreationDate,
                     Tuition = contributionResult.Data.Data.Tuition,
                     DefaultImageId = contributionResult.Data.Data.DefaultImageId,
+                    Description = contributionResult.Data.Data.Description,
                 };
                 if (contributionResult.Data.Data!.Latitude.HasValue && contributionResult.Data.Data!.Longitude.HasValue)
                 {
