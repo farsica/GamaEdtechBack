@@ -76,7 +76,7 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
                 var result = await schoolService.Value.GetSchoolAsync(new IdEqualsSpecification<School, long>(id));
                 return Ok<SchoolResponseViewModel>(new(result.Errors)
                 {
-                    Data = result.Data is null ? null : MapFrom(result.Data)
+                    Data = MapFrom(result.Data)
                 });
             }
             catch (Exception exc)
@@ -609,16 +609,21 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
                     return Ok(new ApiResponse<SchoolContributionReviewViewModel>(contributionResult.Errors));
                 }
 
-                var schoolResult = await schoolService.Value.GetSchoolAsync(new IdEqualsSpecification<School, long>(contributionResult.Data.IdentifierId.GetValueOrDefault()));
-                if (schoolResult.OperationResult is not Constants.OperationResult.Succeeded)
+                SchoolDto? schoolDto = null;
+                if (contributionResult.Data.IdentifierId.HasValue)
                 {
-                    return Ok(new ApiResponse<SchoolContributionReviewViewModel>(schoolResult.Errors));
+                    var data = await schoolService.Value.GetSchoolAsync(new IdEqualsSpecification<School, long>(contributionResult.Data.IdentifierId.Value));
+                    if (data.OperationResult is not Constants.OperationResult.Succeeded)
+                    {
+                        return Ok<SchoolContributionReviewViewModel>(new(data.Errors));
+                    }
+                    schoolDto = data.Data;
                 }
 
                 SchoolContributionReviewViewModel result = new()
                 {
-                    NewValues = Api.Controllers.SchoolsController.MapFrom(contributionResult.Data.Data!),
-                    OldValues = MapFrom(schoolResult.Data!),
+                    NewValues = Api.Controllers.SchoolsController.MapFrom(contributionResult.Data.Data),
+                    OldValues = MapFrom(schoolDto),
                 };
 
                 return Ok(new ApiResponse<SchoolContributionReviewViewModel>
@@ -787,7 +792,7 @@ namespace GamaEdtech.Presentation.Api.Areas.Admin.Controllers
 
         #endregion
 
-        private static SchoolResponseViewModel MapFrom(SchoolDto dto) => new()
+        private static SchoolResponseViewModel? MapFrom(SchoolDto? dto) => dto is null ? null : new()
         {
             Id = dto.Id,
             Address = dto.Address,
